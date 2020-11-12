@@ -4,9 +4,16 @@ use Alura\Pdo\Domain\Model\Student;
 
 require_once 'vendor/autoload.php';
 
-$pdo = new PDO('sqlite:' . __DIR__ . '/banco.sqlite');
+$pdo = \Alura\Pdo\Infra\Persistence\ConnectionCreator::createConnection();
 
-$student = new Student(null, 'Anderson Rafael', new \DateTimeImmutable('1995-10-05'));
-$sqlInsert = "INSERT INTO studensts (name, birth_date) VALUES ('{$student->name()}', '{$student->birthDate()->format('Y-m-d')}');";
+$student = new Student(
+    null,
+    'Anderson Rafael Schlender',
+    new \DateTimeImmutable('1995-10-05')
+);
 
-var_dump($pdo->exec($sqlInsert));
+$statement = $pdo->prepare("INSERT INTO studensts (name, birth_date) VALUES (:name, :birth_date);");
+$statement->bindValue(':name', $student->name());
+$statement->bindValue(':birth_date', $student->birthDate()->format('Y-m-d'));
+
+var_dump($statement->execute());
